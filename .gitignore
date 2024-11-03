@@ -26,3 +26,4 @@ go.work.sum
 .VSCodeCounter
 .vscode
 app/db
+web/optivum-better-schedule-frontend/src/components/_.vue

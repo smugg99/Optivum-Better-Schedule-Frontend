@@ -1,8 +1,8 @@
-<!-- DivisionButton.vue -->
+<!-- TeacherButton.vue -->
 <template>
 	<div ref="tilt" class="tilt-wrapper">
 		<v-btn class="button" :style="{ backgroundColor: getButtonColor(index) }" :ripple="true" elevation="8"
-			variant="text" rounded="xl" :to="`/division/${props.id}`" nav link>
+			variant="text" rounded="xl" :to="`/teacher/${props.id}`" nav link>
 			<div class="button-content">
 				<span class="full-name">{{ props.text }}</span>
 				<span class="designator">{{ props.designator }}</span>
@@ -98,12 +98,12 @@ onUnmounted(() => {
 }
 
 .full-name {
-	max-width: 90vw;
 	font-size: clamp(0.5rem, 1vw + 0.4rem, 0.8rem);
 	font-weight: 600;
 	text-align: center;
-	white-space: normal;
-	word-wrap: normal;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	margin-bottom: 0.3rem;
 }
 
@@ -128,6 +128,7 @@ onUnmounted(() => {
 	.full-name {
 		font-size: 0.9rem;
 		font-weight: 800;
+		white-space: normal;
 	}
 
 	.designator {

@@ -3,7 +3,7 @@
 	<!-- <div class="fill-height fill-width pa-0">
 		<v-slide-y-reverse-transition appear>
 			<div class="grid-container pa-0 fill-height">
-				<v-row class="division-grid" align="center" justify="center">
+				<v-row class="room-grid" align="center" justify="center">
 					<ScheduleTable class="grid-item" :index="id" :type="type" />
 				</v-row>
 			</div>
@@ -14,8 +14,7 @@
 
 <script setup lang="ts">
 import ScheduleTable from '../ScheduleTable.vue';
-
-const type = "division";
+const type = "room";
 </script>
 
 <!-- <style scoped>
@@ -28,7 +27,7 @@ const type = "division";
 	height: 100vh;
 }
 
-.division-grid {
+.room-grid {
 	display: grid;
 	grid-template-rows: auto;
 	width: 100%;

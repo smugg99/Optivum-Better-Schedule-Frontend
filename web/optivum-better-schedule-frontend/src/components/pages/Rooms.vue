@@ -1,22 +1,20 @@
-<!-- DivisionsPage.vue -->
 <template>
 	<v-slide-y-transition appear>
 		<v-card class="search-container pa-0" elevation="8" rounded="pill">
-			<v-text-field v-model="search" class="search" :label="t('search.division')" prepend-inner-icon="mdi-magnify"
+			<v-text-field v-model="search" class="search" :label="t('search.room')" prepend-inner-icon="mdi-magnify"
 				variant="solo" rounded="pill" hide-details="auto" @input="debouncedSearch" />
 		</v-card>
 	</v-slide-y-transition>
 
 	<v-slide-y-reverse-transition appear>
 		<v-container class="scrollable-grid pa-0">
-			<v-container class="divisions-grid pa-0">
-				<v-col v-for="(division, index) in filteredDivisions" :key="division.id" class="grid-item pa-0">
-					<DivisionButton :text="division.full_name" :designator="division.designator" :index="index"
-						:id="division.id" />
+			<v-container class="rooms-grid pa-0">
+				<v-col v-for="(room, index) in filteredRooms" :key="room.id" class="grid-item pa-0">
+					<RoomButton :text="room.full_name" :designator="room.designator" :index="index" :id="room.id" />
 				</v-col>
 			</v-container>
-			<v-empty-state v-if="!loading && filteredDivisions.length === 0" icon="mdi-magnify-remove-outline"
-				class="no-divisions" :title="t('page.no_divisions')" />
+			<v-empty-state v-if="!loading && filteredRooms.length === 0" icon="mdi-magnify-remove-outline"
+				class="no-rooms" :title="t('page.no_rooms')" />
 		</v-container>
 	</v-slide-y-reverse-transition>
 
@@ -34,9 +32,9 @@ import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useI18n } from 'vue-i18n';
 import { debounce } from 'lodash-es';
-import DivisionButton from '../DivisionButton.vue'
+import RoomButton from '../RoomButton.vue'
 
-interface Division {
+interface Room {
 	designator: string;
 	id: number;
 	full_name: string;
@@ -45,30 +43,32 @@ interface Division {
 const { t } = useI18n();
 
 const search = ref('');
-const divisions = ref<Division[]>([]);
+const rooms = ref<Room[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
 
-const fetchDivisions = async () => {
+const fetchRooms = async () => {
 	loading.value = true;
 	try {
-		const response = await axios.get('/api/v1/divisions');
+		const response = await axios.get('/api/v1/rooms');
 		const designators = response.data.designators;
 		const fullNames = response.data.full_names;
 
-		divisions.value = Object.keys(designators).map((designator) => {
+		rooms.value = Object.keys(designators).map((designator) => {
 			const id = designators[designator];
+			const designatorKey = Object.keys(designators).find(key => designators[key] === id);
 			const full_name = Object.keys(fullNames).find((name) => fullNames[name] === id) || '';
+			const display_name = designatorKey && designatorKey !== full_name ? `${full_name} (${designatorKey})` : full_name;
 
 			return {
 				designator,
 				id,
-				full_name,
+				full_name: display_name,
 			};
 		});
 	} catch (err) {
-		console.error('Error fetching divisions:', err);
-		error.value = 'Failed to fetch division data.';
+		console.error('Error fetching rooms:', err);
+		error.value = 'Failed to fetch room data.';
 	} finally {
 		loading.value = false;
 	}
@@ -76,16 +76,16 @@ const fetchDivisions = async () => {
 
 const debouncedSearch = debounce(() => { }, 100);
 
-const filteredDivisions = computed(() => {
+const filteredRooms = computed(() => {
 	const searchValue = search.value.toLowerCase().trim();
-	return divisions.value.filter(
-		(division) =>
-			division.designator.toLowerCase().includes(searchValue) ||
-			division.full_name.toLowerCase().includes(searchValue)
+	return rooms.value.filter(
+		(room) =>
+			room.designator.toLowerCase().includes(searchValue) ||
+			room.full_name.toLowerCase().includes(searchValue)
 	);
 });
 
-onMounted(fetchDivisions);
+onMounted(fetchRooms);
 </script>
 
 <style scoped lang="scss">
@@ -132,7 +132,7 @@ onMounted(fetchDivisions);
 	overflow: visible;
 }
 
-.divisions-grid {
+.rooms-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
 	column-gap: clamp(0rem, 2vw, 1rem);
@@ -163,15 +163,16 @@ onMounted(fetchDivisions);
 	padding: 1rem;
 }
 
-.no-divisions {
+.no-rooms {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	padding: 16px;
+	color: rgba(0, 0, 0, 0.6);
 }
 
-.no-divisions v-icon {
+.no-rooms v-icon {
 	margin-bottom: 8px;
 }
 
@@ -195,7 +196,7 @@ onMounted(fetchDivisions);
 		margin-top: calc(64px + 16px);
 	}
 
-	.divisions-grid {
+	.rooms-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(30%, 1fr));
 		row-gap: 0rem;
@@ -220,7 +221,7 @@ onMounted(fetchDivisions);
 }
 
 @media (max-width: 767px) {
-	.divisions-grid {
+	.rooms-grid {
 		grid-template-columns: repeat(auto-fill, minmax(50%, 1fr));
 	}
 }

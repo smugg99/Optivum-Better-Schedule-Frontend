@@ -1,18 +1,16 @@
-<!-- DivisionButton.vue -->
 <template>
 	<div ref="tilt" class="tilt-wrapper">
 		<v-btn class="button" :style="{ backgroundColor: getButtonColor(index) }" :ripple="true" elevation="8"
-			variant="text" rounded="xl" :to="`/division/${props.id}`" nav link>
+			variant="text" rounded="xl" :to="`/room/${props.id}`" nav link>
 			<div class="button-content">
-				<span class="full-name">{{ props.text }}</span>
-				<span class="designator">{{ props.designator }}</span>
+				<span :class="['full-name', fontSizeClass]">{{ props.text }}</span>
 			</div>
 		</v-btn>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted, watchEffect } from 'vue';
+import { ref, onUnmounted, watchEffect, computed } from 'vue';
 import VanillaTilt from 'vanilla-tilt';
 import { useTheme } from 'vuetify';
 
@@ -64,6 +62,13 @@ onUnmounted(() => {
 	}
 	window.removeEventListener('resize', resizeHandler);
 });
+
+// Compute a class based on text length
+const fontSizeClass = computed(() => {
+	if (props.text.length <= 5) return 'font-large';
+	if (props.text.length <= 10) return 'font-medium';
+	return 'font-small';
+});
 </script>
 
 <style scoped>
@@ -93,27 +98,33 @@ onUnmounted(() => {
 	align-items: center;
 	width: 100%;
 	height: 100%;
-	padding: 0.5rem;
 	box-sizing: border-box;
 }
 
 .full-name {
-	max-width: 90vw;
-	font-size: clamp(0.5rem, 1vw + 0.4rem, 0.8rem);
-	font-weight: 600;
-	text-align: center;
-	white-space: normal;
-	word-wrap: normal;
-	margin-bottom: 0.3rem;
-}
-
-.designator {
-	font-size: clamp(0.8rem, 1vw + 0.3rem, 1rem);
+	width: 90%;
+	height: 90%;
 	font-weight: 800;
 	text-align: center;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+	white-space: normal;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.font-large {
+	font-size: 1.5rem;
+	font-weight: 800;
+}
+
+.font-medium {
+	font-size: 1.2rem;
+	font-weight: 800;
+}
+
+.font-small {
+	font-size: 1rem;
+	font-weight: 800;
 }
 
 @media (max-width: 767px) {
@@ -123,16 +134,6 @@ onUnmounted(() => {
 
 	.button-content {
 		padding: 0.4rem;
-	}
-
-	.full-name {
-		font-size: 0.9rem;
-		font-weight: 800;
-	}
-
-	.designator {
-		font-size: 0.9rem;
-		font-weight: 600;
 	}
 }
 </style>
